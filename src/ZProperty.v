@@ -26,6 +26,22 @@ Definition Z_comp {A:Type} (R :Rel A) := exists (R1 R2: Rel A) (f1 f2: A -> A), 
 
 Definition Z_comp_eq {A:Type} (R :Rel A) := exists (R1 R2: Rel A) (f1 f2: A -> A), (forall x y, R x y <-> (R1 !_! R2) x y) /\ (forall a b, R1 a b -> (f1 a) = (f1 b)) /\ (forall a, (refltrans R1) a (f1 a)) /\ (forall b a, a = f1 b -> (refltrans R) a (f2 a)) /\ (f_is_weak_Z R2 R (f2 # f1)).
 
+Inductive trans {A} (red: Rel A) : Rel A :=
+| singl: forall a b,  red a b -> trans red a b
+| transit: forall b a c,  red a b -> trans red b c -> trans red a c.
+
+Arguments transit {A} {red} _ _ _ _ _ .
+
+Lemma trans_composition {A} (R: Rel A):
+  forall t u v, trans R t u -> trans R u v -> trans R t v.
+Proof.
+  intros t u v H1 H2. induction H1.
+  - apply transit with b; assumption.
+  - apply transit with b.
+    + assumption.
+    + apply IHtrans; assumption.
+Qed.
+
 Lemma refltrans_composition {A} (R: Rel A): forall t u v, refltrans R t u -> refltrans R u v -> refltrans R t v.
 Proof.
   intros t u v.

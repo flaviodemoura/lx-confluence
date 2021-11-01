@@ -1,3 +1,6 @@
 -R . Lib
 src/ZProperty.v
 src/Confluence.v
+src/InfraES.v
+src/LambdaES.v
+src/LambdaESConfluence.v
