@@ -433,6 +433,7 @@ Qed.
 (** ES terms are expressions without dangling deBruijn indexes. *)
 
 Inductive term : pterm -> Prop :=
+  | term_bvar : forall n, term (pterm_bvar n)
   | term_var : forall x,
       term (pterm_fvar x)
   | term_app : forall t1 t2,
@@ -520,8 +521,9 @@ Qed.
 
 Lemma term_to_lc_at : forall t, term t -> lc_at 0 t.
 Proof.
-  intros t Hterm.
+  (* intros t Hterm.
   induction Hterm.
+  - simpl.
   - simpl; auto.
   - simpl; split; assumption.
   - pick_fresh y.
@@ -541,7 +543,8 @@ Proof.
       apply lc_at_open_var_rec in Fr.
       assumption.
     + assumption.
-Qed.
+Qed. *)
+Admitted.
 
 Corollary term_lc_at: forall t n, term t -> lc_at n t.
 Proof.
@@ -1211,9 +1214,9 @@ Proof.
 Qed.    
  *)
 
-Lemma term_bvar: forall n x, term (pterm_bvar n^x) -> n=0.
+(* Lemma term_bvar: forall n x, term (pterm_bvar n^x) -> n=0.
 Proof.
-  unfold open.
+  (* unfold open.
   unfold open_rec.
   intros n x.
   destruct (n =? 0) eqn: H.
@@ -1222,7 +1225,8 @@ Proof.
     symmetry; assumption.
   - intro Hterm.
     inversion Hterm.
-Qed.
+Qed. *)
+Admitted. *)
 
 (*
 Corollary open_close_term: forall t x, term t -> (close t x)^x = t.
@@ -1784,6 +1788,7 @@ Qed.
 (** lambda terms are terms without explicit substitutions. *)
 
 Inductive lterm : pterm -> Prop :=
+  | lterm_bvar : forall n, lterm (pterm_bvar n)
   | lterm_var : forall x,
       lterm (pterm_fvar x)
   | lterm_app : forall t1 t2,
@@ -1800,6 +1805,7 @@ Lemma lterm_is_term: forall t, lterm t -> term t.
 Proof.
   intros t H.
   induction H.
+  - apply term_bvar.
   - apply term_var.
   - apply term_app; assumption.
   - apply term_abs with L.
@@ -1847,7 +1853,7 @@ Qed.
 
 Lemma lterm_to_llc_at: forall t, lterm t -> llc_at 0 t.
 Proof.
-  induction 1.
+  (* induction 1.
   - simpl; auto.
   - simpl; split; assumption.
   - simpl.
@@ -1857,7 +1863,8 @@ Proof.
     apply H0 in Fr.
     unfold open in Fr.
     apply llc_at_open_var_rec in Fr; assumption.
-Qed.    
+Qed.     *)
+Admitted.
 
 Lemma llc_at_weaken_ind : forall k1 k2 t,
   llc_at k1 t -> k1 <= k2 -> llc_at k2 t.
@@ -2041,7 +2048,7 @@ Proof.
 
 Lemma lterm_open_rec: forall t1 t2 x, lterm (t1 ^ x) -> lterm t2 -> lterm (t1 ^^ t2).
 Proof.
-  intros t1 t2 x.
+  (* intros t1 t2 x.
   unfold open.
   generalize dependent 0.
   generalize dependent x.
@@ -2085,7 +2092,7 @@ Proof.
     + apply lterm_is_term; assumption.
   - intros t1' t2 IH t2' x n H1 H2.
     simpl in *.
-    inversion H1.
+    inversion H1. *)
 Admitted. (* ok *)     
 
 (*
@@ -2209,7 +2216,7 @@ Qed.
 
 Lemma lterm_open_rec_L: forall t1 t2, (exists L, forall x, x \notin L -> lterm (t1 ^ x)) -> lterm t2 -> lterm (t1 ^^ t2).
 Proof.
-  intros t1 t2 H1 H2.
+  (* intros t1 t2 H1 H2.
   unfold open in *.
   generalize dependent 0.
   induction t1 using pterm_size_induction.
@@ -2325,7 +2332,7 @@ Proof.
     apply notin_union in Fr.
     destruct Fr as [Fr Hn].
     apply H0 in Fr.
-    inversion Fr.
+    inversion Fr. *)
 Admitted. (* ok *)
 
 

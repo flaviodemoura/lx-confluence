@@ -1035,6 +1035,7 @@ Proof.
     + simpl.
       apply lterm_var.
     + inversion Hlterm.
+      apply lterm_bvar.
   - intros v IH x n Hlterm.
     simpl.
     apply lterm_var.
@@ -1124,9 +1125,14 @@ Proof.
     + apply lterm_var.
     + simpl in Hlterm.
       inversion Hlterm.
-  - intros v n IH x Hlterm.
-    simpl.
-    apply lterm_var.
+      apply lterm_bvar.
+  - intros n n' IH x Hlterm.
+    simpl in *.
+    destruct (n =? n') eqn:H.
+    + apply lterm_var.
+    + simpl in Hlterm.
+      inversion Hlterm.
+      apply lterm_var.
   - intros t1 t2 n IH x Hlterm.
     simpl in *.
     inversion Hlterm; subst; clear Hlterm.
@@ -1186,7 +1192,7 @@ Admitted. (* ok *)
   
 Lemma lterm_to_llc_at: forall t x n, lterm ({n ~> pterm_fvar x} t) -> llc_at (S n) t.
 Proof.
-  induction t using pterm_size_induction.
+  (* induction t using pterm_size_induction.
   generalize dependent H; case t.
   - intros n IH x n' Hlterm.
     simpl in *.
@@ -1230,12 +1236,12 @@ Proof.
       * apply lterm_open_rec_rename with x'; assumption.     
   - intros t1 t2 IH x n Hlterm.
     simpl in Hlterm.
-    inversion Hlterm.
+    inversion Hlterm. *)
 Admitted. (* ok *)
     
 Lemma lterm_to_llc_at_max: forall t x y i j, i < j -> lterm ({i ~> pterm_fvar x} ({j ~> pterm_fvar y} t)) -> llc_at (S j) t.
 Proof.
-  induction t.
+  (* induction t.
   - intros x y i j Hleq Hlterm.
     simpl in Hlterm.
     destruct (n =? j) eqn:Heq.
@@ -1278,7 +1284,7 @@ Proof.
     apply llc_at_open_rec in Fr.
     + apply llc_at_open_rec in Fr.
       * assumption.
-      * admit. (* ok *)
+      * admit. ok *)
 Admitted. (* ok *)
 
 (*
@@ -1324,6 +1330,16 @@ Qed.
 
 Lemma term_P_lterm: forall t, lterm (P t).
 Proof.
+    intro t.
+    induction t using pterm_size_induction.
+    generalize dependent H.
+    case t.
+    - intros n t0.
+      simpl.
+      apply lterm_bvar.
+    - intros v IH. 
+      simpl.
+      apply lterm_var.
   (* intro t.
   induction t using pterm_size_induction.
   generalize dependent H.
@@ -1418,6 +1434,7 @@ Qed.
 Lemma lterm_P_id: forall t, lterm t -> P t = t.
 Proof.
   induction 1.
+  - simpl. reflexivity.
   - reflexivity.
   - simpl.
     rewrite IHlterm1.
@@ -1432,6 +1449,29 @@ Proof.
     apply H0 in Fr'; clear H0.
 Admitted.
 
+Lemma term_P: forall t, term t -> term (P t).
+Proof.
+  intros t0 IH.
+  induction IH.
+  - simpl.
+    apply term_bvar.
+  - simpl.
+    apply term_var.
+  - simpl.
+    apply term_app.
+    + assumption.
+    + assumption.
+  - simpl.
+    apply term_abs with L.
+    intros x Hnot_union.
+Admitted.
+
+Lemma substitution_equality_with_P: forall t1 t2 n x, P({n ~> pterm_fvar x} t1) = P({n ~> pterm_fvar x} t2) -> P(t1) = P(t2).
+Proof. 
+  intros.
+  
+Admitted.
+
 (** Lemma 5.3 item 1 *)
 Lemma sys_x_P_eq: forall t1 t2, t1 ->_x t2 -> P t1 = P t2.
 Proof.
@@ -1440,11 +1480,54 @@ Proof.
   - inversion H; subst.
     + simpl.
       reflexivity.
+    + simpl. unfold open in *. simpl. apply term_P in H0. 
+      rewrite open_rec_term. 
+      * reflexivity.
+      * assumption.
+    + unfold open in *.
+      simpl.
+      reflexivity.
     + simpl.
-      admit.
-    + Admitted.
-    
-
+      unfold open in *.
+      simpl.
+      admit. (** problema *)
+  - simpl.
+    rewrite IHES_contextual_closure.
+    reflexivity.
+  - simpl.
+    rewrite IHES_contextual_closure.
+    reflexivity.
+  - simpl.
+    pick_fresh x.
+    apply notin_union in Fr.
+    destruct Fr.
+    apply notin_union in H1.
+    destruct H1.
+    apply H0 in H1.
+    unfold open in H1.
+    simpl in H1.
+    apply substitution_equality_with_P in H1.
+    rewrite H1.
+    reflexivity.
+  - simpl. 
+    unfold open in *.
+    simpl.
+    pick_fresh x.
+    apply notin_union in Fr.
+    destruct Fr.
+    apply notin_union in H2.
+    destruct H2.
+    apply notin_union in H2.
+    destruct H2.
+    apply H0 in H2.
+    apply substitution_equality_with_P in H2.
+    rewrite H2.
+    reflexivity.
+  - simpl.
+    rewrite IHES_contextual_closure.
+    reflexivity.
+Admitted.
+     
 Lemma term_to_P: forall t, t ->_x* P t. 
 Proof.
   induction t.
@@ -1462,6 +1545,7 @@ Admitted.
 
 Lemma lambda_x_Z_comp: forall t1 t2, t1 ->_B t2 -> t2 ->_lx* B(P t1) /\  B(P t1) ->_lx* B(P t2).
 Proof.
+
 Admitted.
 
 Theorem lambda_x_Z_comp_eq: Z_comp_eq lx.

@@ -103,8 +103,8 @@ Qed.
 Lemma term_rename: forall t x y, term t -> term ([x ~> pterm_fvar y] t).
 Proof.
   intros t x y H; induction H.
-  - simpl.
-    case (x0 =? x); apply term_var.
+  - simpl. apply term_bvar.
+  - simpl. case (x0 =? x); apply term_var. 
   - simpl; apply term_app; assumption.
   - specialize (H x).
     apply term_abs with (L \u {{x}} \u {{y}} \u fv t1); fold m_sb.
