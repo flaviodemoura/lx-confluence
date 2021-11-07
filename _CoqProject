@@ -1,6 +1,10 @@
 -R . Lib
 src/ZProperty.v
 src/Confluence.v
-src/InfraES.v
 src/LambdaES.v
+src/lx.v
+src/CompositionProblemLemmas.v
+src/OpenPoints.v
 src/LambdaESConfluence.v
+src/LocallyClosed.v
+src/Rebutall.v
