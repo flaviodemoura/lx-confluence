@@ -223,7 +223,7 @@ Proof.
     + apply IHt1_2; assumption.
 Qed.
 
-Lemma term_P_lterm: forall t, lterm (P t).
+Lemma P_t_is_lterm: forall t, lterm (P t).
 Proof.
   intros t.
   induction t.
@@ -243,7 +243,7 @@ Qed.
 Lemma lterm_open_fvar_P: forall t x, lterm (P t ^ x) -> lterm (P (t ^ x)).
 Proof.
   intros.
-  apply term_P_lterm.
+  apply P_t_is_lterm.
 Qed.
 
 Lemma lterm_P_open_fvar: forall t x, lterm (P (t ^ x)) -> lterm (P t ^ x).
@@ -286,8 +286,8 @@ Proof.
     unfold open in *.
     apply lterm_msub.
     + apply lterm_msub.
-      * apply term_P_lterm.
-      * apply term_P_lterm.
+      * apply P_t_is_lterm.
+      * apply P_t_is_lterm.
     + apply lterm_var.
 Qed.
 
@@ -299,7 +299,7 @@ Proof.
   + apply lterm_open_fvar_P.
 Qed.
 
-Lemma open_rec_P: forall t u n, lterm t -> P({n ~> u} t) = {n ~> P u} (P t).
+Lemma lterm_t_implies_P_prop: forall t u n, lterm t -> P({n ~> u} t) = {n ~> P u} (P t).
 Proof.
   intros t.
   induction t.
@@ -332,7 +332,7 @@ Proof.
     inversion H.
 Qed.
 
-Lemma lterm_P_id: forall t, lterm t -> P t = t.
+Lemma lterm_t_implies_P_t_eq_t: forall t, lterm t -> P t = t.
 Proof.
   induction 1.
   - simpl.
@@ -371,7 +371,7 @@ Proof.
         ** intros b a Heq.
           apply term_to_B.
           rewrite -> Heq.
-          apply term_P_lterm.
+          apply P_t_is_lterm.
         ** apply B_comp_P_is_weak_Z_for_B_by_lx.
 Qed.
 
