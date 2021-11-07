@@ -2,11 +2,33 @@ Require Import ZProperty Confluence LambdaES lx CompositionProblemLemmas OpenPoi
 
 Lemma lterm_open_rec_rename: forall t x y n, lterm ({n ~> pterm_fvar x} t) -> lterm ({n ~> pterm_fvar y} t).  
 Proof.
-  intros.
-  apply lterm_msub.
-  - admit. (** ok **)
-  - apply lterm_var.
-Admitted.
+  intros t x y.
+  induction t.
+  - intros n0 Hlterm.
+    simpl.
+    destruct(n =? n0).
+    + apply lterm_var.
+    + apply lterm_bvar.
+  - intros.
+    simpl.
+    apply lterm_var.
+  - intros.
+    simpl.
+    inversion H; subst.
+    apply lterm_app.
+    + apply IHt1.
+      assumption.
+    + apply IHt2.
+      assumption.
+  - intros.
+    simpl in *.
+    apply lterm_abs.
+    apply IHt.
+    inversion H.
+    assumption.
+  - intros.
+    inversion H.
+Qed.
 
 Lemma lterm_open_rec_L: forall t1 t2, (exists L, forall x, x \notin L -> lterm (t1 ^ x)) -> lterm t2 -> lterm (t1 ^^ t2).
 Proof.
@@ -267,6 +289,14 @@ Proof.
       * apply term_P_lterm.
       * apply term_P_lterm.
     + apply lterm_var.
+Qed.
+
+Lemma lterm_open_fvar_P_equiv: forall t x, lterm (P (t ^ x)) <-> lterm (P t ^ x).
+Proof.
+  intros.
+  split.
+  + apply lterm_P_open_fvar.
+  + apply lterm_open_fvar_P.
 Qed.
 
 Lemma open_rec_P: forall t u n, lterm t -> P({n ~> u} t) = {n ~> P u} (P t).
