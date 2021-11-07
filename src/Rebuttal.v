@@ -1,15 +1,17 @@
 Require Import ZProperty Confluence LambdaES lx CompositionProblemLemmas OpenPoints Lia.
 
+Require Import Arith MSetList Setoid Lia.
+
 Lemma open_rec_swap_term: forall t t' x i j, i <> j -> term t' -> {j ~> pterm_fvar x} ({i ~> t'} t) = {i ~> t'}({j ~> pterm_fvar x} t).
 Proof.
   intro t; induction t.
   - intros t' x i j Hneq Hterm.
     simpl.
-    destruct (n =? i) eqn: Hni.
-    + destruct (n =? j) eqn: Hnj.
+    destruct (i =? n) eqn: Hni.
+    + destruct (j =? n) eqn: Hnj.
       * admit. (* ok *)
       * admit. (* ok *)
-    + destruct (n =? j) eqn: Hnj.
+    + destruct (j =? n) eqn: Hnj.
       * simpl.
         rewrite Hnj. 
         reflexivity.
@@ -51,7 +53,7 @@ Proof.
   intro t; induction t.
   - intros t x n'.
     simpl.
-    destruct (n =? n') eqn:H.
+    destruct (n' =? n) eqn:H.
     + reflexivity.
     + simpl.
       rewrite H; reflexivity.
@@ -62,7 +64,7 @@ Proof.
     rewrite IHt1.
     rewrite IHt2.
     reflexivity.
-  - intros t x n.
+  - intros.
     simpl.
     rewrite IHt.
 Admitted.  (* problema da composicionalidade *)
@@ -73,11 +75,11 @@ Proof.
   intro t; induction t.
   - intros. 
     simpl.
-    destruct (n =? i) eqn:Hni.
-    + destruct (n =? j) eqn:Hnj.
+    destruct (i =? n) eqn:Hni.
+    + destruct (j =? n) eqn:Hnj.
       * admit.
       * admit.
-    + destruct (n =? j) eqn:Hnj.
+    + destruct (j =? n) eqn:Hnj.
       * admit.
       * admit.
   - intros.
@@ -102,8 +104,8 @@ Proof.
   intro t; induction t.
   - intros t' x i j Hneq.
     simpl.
-    destruct (n =? i) eqn:Hni.
-    + destruct (n =? j) eqn:Hnj.
+    destruct (i =? n) eqn:Hni.
+    + destruct (j =? n) eqn:Hnj.
       * apply beq_nat_true in Hni.
         apply beq_nat_true in Hnj.
         subst.
@@ -113,7 +115,7 @@ Proof.
         simpl.
         rewrite <- beq_nat_refl.
         reflexivity.
-    + destruct (n =? j) eqn:Hnj.
+    + destruct (j =? n) eqn:Hnj.
       * simpl.
         rewrite Hnj.
         reflexivity.
@@ -131,12 +133,12 @@ Proof.
       * reflexivity.
       * assumption.
     + assumption.
-  - intros t x i j Hneq.
+  - intros t0 x i j Hneq.
     simpl.
     rewrite IHt.
     + admit. (* problema com composicionalidade. *)
     + lia.
-  - intros t x i j Hneq.
+  - intros t0 x i j Hneq.
     simpl.
     rewrite IHt1.
     + rewrite IHt2.

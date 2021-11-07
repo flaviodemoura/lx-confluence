@@ -7,4 +7,4 @@ src/CompositionProblemLemmas.v
 src/OpenPoints.v
 src/LambdaESConfluence.v
 src/LocallyClosed.v
-src/Rebutall.v
+src/Rebuttal.v
