@@ -1,2 +1,2 @@
-# Confluência do Cálculo Lambda com Substituições Explícitas
+# Confluência do cálculo lambda-x.
 
