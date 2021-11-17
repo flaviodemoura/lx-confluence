@@ -4,10 +4,43 @@ Lemma full_comp: forall t u, t[u] ->_x* (t ^^ u).
 Proof.
 Admitted.
 
-Lemma substitution_equality_with_P: forall t1 t2 n x, P({n ~> pterm_fvar x} t1) = P({n ~> pterm_fvar x} t2) -> P(t1) = P(t2).
-Proof. 
+Lemma substitution_equality: forall t1 t2 x n, x \notin (fv t1) -> {n ~> pterm_fvar x}t1 = {n ~> pterm_fvar x}t2 -> t1 = t2.
+Proof.
+  intros t1 t2 x n.
   intros.
 Admitted.
+
+Lemma fv_P: forall t, fv t = fv (P t).
+Proof.
+  intros t.
+  induction t.
+  - simpl.
+    reflexivity.
+  - simpl.
+    reflexivity.
+  - simpl.
+    rewrite IHt1.
+    rewrite IHt2.
+    reflexivity.
+  - simpl.
+    rewrite IHt.
+    reflexivity.
+  - simpl.
+    unfold open.
+    simpl.
+    admit. (** ok *)
+Admitted.
+
+Lemma substitution_equality_with_P: forall t1 t2 n x, x \notin (fv t1) -> x \notin (fv t2) -> P({n ~> pterm_fvar x} t1) = P({n ~> pterm_fvar x} t2) -> P(t1) = P(t2).
+Proof. 
+  intros t1 t2 n x Hnot_in_fv_t1 Hnot_in_fv_t2 Heq.
+  rewrite <- open_rec_P_fvar in Heq.
+  rewrite <- open_rec_P_fvar in Heq.
+  apply substitution_equality in Heq.
+  + assumption.
+  + rewrite <- fv_P.
+    assumption.
+Qed.
 
 Lemma sys_x_P_eq: forall t1 t2, t1 ->_x t2 -> P t1 = P t2.
 Proof.
@@ -16,7 +49,7 @@ Proof.
   - inversion H; subst.
     + simpl.
       reflexivity.
-    + simpl. unfold open in *. apply term_P in H0. 
+    + simpl. unfold open in *. 
       rewrite open_rec_term. 
       * inversion H.
         ** admit.
@@ -45,8 +78,10 @@ Proof.
     unfold open in H1.
     simpl in H1.
     apply substitution_equality_with_P in H1.
-    rewrite H1.
-    reflexivity.
+    + rewrite H1.
+      reflexivity.
+    + assumption.
+    + assumption.
   - simpl. 
     unfold open in *.
     simpl.
@@ -59,8 +94,10 @@ Proof.
     destruct H2.
     apply H0 in H2.
     apply substitution_equality_with_P in H2.
-    rewrite H2.
-    reflexivity.
+    + rewrite H2.
+      reflexivity.
+    + assumption.
+    + assumption.
   - simpl.
     rewrite IHES_contextual_closure.
     reflexivity.
