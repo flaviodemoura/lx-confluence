@@ -1,7 +1,3 @@
-Require Import Setoid.
-Require Import ZArith.
-Require Import Setoid.
-
 Definition Rel (A:Type) := A -> A -> Prop.
 
 Inductive refltrans {A:Type} (R: Rel A) : A -> A -> Prop :=

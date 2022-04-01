@@ -1,6 +1,7 @@
 Definition var := nat.
 
-Require Import Arith MSetList Setoid Lia ZProperty Confluence.
+Require Import Arith Lia ZProperty Confluence.
+Require Import MSetList Setoid.
 
 Declare Module Var_as_OT : UsualOrderedType
   with Definition t := var.
@@ -49,7 +50,6 @@ Proof.
     destruct H.
     destruct H0; contradiction.
 Qed.
-
 
 Lemma eq_var_dec : forall x y : var, {x = y} + {x <> y}.
 Proof. exact eq_nat_dec. Qed.
@@ -428,26 +428,6 @@ Proof.
   apply m_sb_intro; assumption.
 Qed.
  
-(** ES terms are expressions without dangling deBruijn indexes. *)
-Inductive term : pterm -> Prop :=
-  | term_bvar : forall x,
-      term (pterm_bvar x)
-  | term_var : forall x,
-      term (pterm_fvar x)
-  | term_app : forall t1 t2,
-      term t1 -> 
-      term t2 -> 
-      term (pterm_app t1 t2)
-  | term_abs : forall L t1,
-      (forall x, x \notin L -> term (t1 ^ x)) ->
-      term (pterm_abs t1)
-  | term_sub : forall L t1 t2,
-     (forall x, x \notin L -> term (t1 ^ x)) ->
-      term t2 -> 
-      term (pterm_sub t1 t2).
-
-Definition body t := exists L, forall x, x \notin L -> term (t ^ x).
-
 Fixpoint lc_at (k:nat) (t:pterm) : Prop :=
   match t with
   | pterm_bvar i    => i < k
@@ -517,9 +497,50 @@ Proof.
     + apply IHt2 with x; assumption.
 Qed. 
 
+(** ES terms are expressions without dangling deBruijn indexes. *)
+Inductive term : pterm -> Prop :=
+  | term_var : forall x,
+      term (pterm_fvar x)
+  | term_app : forall t1 t2,
+      term t1 -> 
+      term t2 -> 
+      term (pterm_app t1 t2)
+  | term_abs : forall t1, lc_at 1 t1 ->
+      term (pterm_abs t1)
+  | term_sub : forall t1 t2, lc_at 1 t1 ->
+      term t2 -> term (pterm_sub t1 t2).
+(*
+Inductive term : pterm -> Prop :=
+(*  | term_bvar : forall x,
+      term (pterm_bvar x) *)
+  | term_var : forall x,
+      term (pterm_fvar x)
+  | term_app : forall t1 t2,
+      term t1 -> 
+      term t2 -> 
+      term (pterm_app t1 t2)
+  | term_abs : forall L t1,
+      (forall x, x \notin L -> term (t1 ^ x)) ->
+      term (pterm_abs t1)
+  | term_sub : forall L t1 t2,
+     (forall x, x \notin L -> term (t1 ^ x)) ->
+      term t2 -> 
+      term (pterm_sub t1 t2). *)
+
+Definition body t := exists L, forall x, x \notin L -> term (t ^ x).
+
 Lemma term_to_lc_at : forall t, term t -> lc_at 0 t.
 Proof.
-Admitted.
+  induction 1.
+  - simpl.
+    auto.
+  - simpl.
+    split; assumption.
+  - simpl.
+    auto.
+  - simpl.
+    split; assumption.
+Qed.
 
 Corollary term_lc_at: forall t n, term t -> lc_at n t.
 Proof.
