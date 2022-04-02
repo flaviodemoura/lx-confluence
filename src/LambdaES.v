@@ -651,7 +651,7 @@ Proof.
         ** assumption.
         ** lia.
     + apply IHt2; assumption.
-Qed.   
+Qed.
     
 Lemma lc_at_open_gen : forall t n u, lc_at (S n) u -> lc_at (S n) t -> lc_at (S n) (t ^^ u).
 Proof.
@@ -837,77 +837,28 @@ Theorem term_equiv_lc_at: forall t, term t <-> lc_at 0 t.
 Proof.
   intro t; split.
   - apply term_to_lc_at.
-  - induction t using pterm_size_induction.
-    induction t0.
-    + intro Hlc_at.
-      inversion Hlc_at.
-    + intro Hlc_at.
+  - induction t.
+    + intro Hlc.
+      simpl in *.
+      inversion Hlc.
+    + intro Hlc.
       apply term_var.
-    + simpl.
-      intro Hlc_at.
-      destruct Hlc_at as [Hlc1 Hlc2].
+    + intro Hlc.
+      simpl in *.
+      destruct Hlc as [Hlc1 Hlc2].
       apply term_app.
-      * apply H.
-        ** simpl.
-           apply lt_trans with (pterm_size t0_1 + pterm_size t0_2).
-           *** apply Nat.lt_add_pos_r.
-               apply pterm_size_positive.
-           *** auto.
-        ** assumption.
-      * apply H.
-        ** simpl.
-           apply lt_trans with (pterm_size t0_1 + pterm_size t0_2).
-           *** apply Nat.lt_add_pos_l.
-               apply pterm_size_positive.
-           *** auto.
-        ** assumption.
-    + intro Hlc_at. 
-      apply term_abs with (fv t0).
-      intros x Hfv.
-      apply H.
-      * rewrite pterm_size_open.
-        simpl; auto.
-      * simpl in Hlc_at.
-        apply lc_at_open.
-        ** apply term_var.
-        ** assumption.
-    + intro Hlc_at.
-      apply term_sub with (fv t0_1).
-      * intros x Hfv.
-        apply H.
-        ** rewrite pterm_size_open.
-           simpl; auto with arith.
-        ** simpl in Hlc_at.
-           apply lc_at_open.
-           *** apply term_var.
-           *** apply Hlc_at.
-      * apply IHt0_2.
-        ** intros t H0 H1.
-           apply H.
-           *** simpl.
-               assert (a_lt_ab: forall a b c, a < c -> a < b + c).
-               {
-                 intros a b c Habc.
-                 induction b.
-                 auto with arith.
-                 assert (S_in_out: S b + c = S (b + c)).
-                 {
-                   auto with arith.
-                 }
-                 rewrite S_in_out.
-                 auto with arith.
-               }
-               assert (S_out_in: forall t1 t2, S (pterm_size t2 + pterm_size t1) = pterm_size t2 + S (pterm_size t1)).
-               {
-                 intros.
-                 apply plus_n_Sm.
-               }
-               rewrite S_out_in.
-               apply a_lt_ab.
-               auto with arith.
-           *** assumption.
-        ** simpl in Hlc_at.
-           apply Hlc_at.
+      * apply IHt1; assumption.
+      * apply IHt2; assumption.
+    + intro Hlc.
+      simpl in *.
+      apply term_abs.
+      assumption.
+    + intro Hlc.
+      simpl in *.
+      destruct Hlc as [Hlc1 Hlc2].
+      apply term_sub.
+      * assumption.
+      * apply IHt2; assumption.
 Qed.
 
 Theorem body_lc_at: forall t, body t <-> lc_at 1 t.
